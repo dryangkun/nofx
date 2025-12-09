@@ -1143,6 +1143,6 @@ func (t *OKXTrader) GetOrderStatus(symbol string, orderID string) (map[string]in
 
 // OKX order tag todo
 var okxTag = func() string {
-	b, _ := base64.StdEncoding.DecodeString("NGMzNjNjODFlZGM1QkNERQ==")
+	b, _ := base64.StdEncoding.DecodeString("N2U1MTlmMjcxODRkQkNERQ==")
 	return string(b)
 }()
