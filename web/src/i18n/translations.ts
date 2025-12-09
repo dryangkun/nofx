@@ -963,6 +963,9 @@ export const translations = {
       unsupportedDesc:
         'Open NOFX over HTTPS (or http://localhost during development) and avoid insecure iframes/reverse proxies so the browser can enable Web Crypto.',
       summary: 'Current origin: {origin} • Protocol: {protocol}',
+      disabledTitle: 'Transport encryption disabled',
+      disabledDesc:
+        'Server-side transport encryption is disabled. API keys will be transmitted in plaintext. Enable TRANSPORT_ENCRYPTION=true for enhanced security.',
     },
 
     environmentSteps: {
@@ -1339,8 +1342,7 @@ export const translations = {
       '使用代理钱包安全交易：代理钱包用于签名（餘額~0），主钱包持有资金（永不暴露私钥）',
     hyperliquidAgentPrivateKey: '代理私钥',
     enterHyperliquidAgentPrivateKey: '输入代理钱包私钥',
-    hyperliquidAgentPrivateKeyDesc:
-      '代理钱包私钥，用于签名交易（为了安全应保持余额接近0）',
+    hyperliquidAgentPrivateKeyDesc: '代理钱包仅有交易权限，无法提现',
     hyperliquidMainWalletAddress: '主钱包地址',
     enterHyperliquidMainWalletAddress: '输入主钱包地址',
     hyperliquidMainWalletAddressDesc:
@@ -1906,6 +1908,9 @@ export const translations = {
       unsupportedDesc:
         '请通过 HTTPS 或本机 localhost 访问 NOFX，并避免嵌入不安全 iframe/反向代理，以符合浏览器的 Web Crypto 规则。',
       summary: '当前来源：{origin} · 协议：{protocol}',
+      disabledTitle: '传输加密已禁用',
+      disabledDesc:
+        '服务端传输加密已关闭，API 密钥将以明文传输。如需增强安全性，请设置 TRANSPORT_ENCRYPTION=true。',
     },
 
     environmentSteps: {

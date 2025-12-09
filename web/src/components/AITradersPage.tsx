@@ -16,10 +16,6 @@ import { getModelIcon } from './ModelIcons'
 import { TraderConfigModal } from './TraderConfigModal'
 import { PunkAvatar, getTraderAvatar } from './PunkAvatar'
 import {
-  TwoStageKeyModal,
-  type TwoStageKeyModalResult,
-} from './TwoStageKeyModal'
-import {
   WebCryptoEnvironmentCheck,
   type WebCryptoCheckStatus,
 } from './WebCryptoEnvironmentCheck'
@@ -34,6 +30,8 @@ import {
   BookOpen,
   HelpCircle,
   Pencil,
+  UserPlus,
+  ExternalLink,
 } from 'lucide-react'
 import { confirmToast } from '../lib/notify'
 import { toast } from 'sonner'
@@ -1601,15 +1599,20 @@ function ExchangeConfigModal({
   const [lighterPrivateKey, setLighterPrivateKey] = useState('')
   const [lighterApiKeyPrivateKey, setLighterApiKeyPrivateKey] = useState('')
 
-  // 安全输入状态
-  const [secureInputTarget, setSecureInputTarget] = useState<
-    null | 'hyperliquid' | 'aster' | 'lighter'
-  >(null)
-
   // 获取当前编辑的交易所信息
   const selectedExchange = allExchanges?.find(
     (e) => e.id === selectedExchangeId
   )
+
+  // 交易所注册链接配置
+  const exchangeRegistrationLinks: Record<string, { url: string; hasReferral?: boolean }> = {
+    binance: { url: 'https://www.binance.com/join?ref=NOFXAI', hasReferral: true },
+    okx: { url: 'https://www.okx.com/join/1865360', hasReferral: true },
+    bybit: { url: 'https://partner.bybit.com/b/83856', hasReferral: true },
+    hyperliquid: { url: 'https://app.hyperliquid.xyz/join/AITRADING', hasReferral: true },
+    aster: { url: 'https://www.asterdex.com/en/referral/fdfc0e', hasReferral: true },
+    lighter: { url: 'https://lighter.xyz', hasReferral: false },
+  }
 
   // 如果是编辑现有交易所，初始化表单数据
   useEffect(() => {
@@ -1691,44 +1694,6 @@ function ExchangeConfigModal({
         t('copyIPFailed', language) || `复制失败: ${ip}\n请手动复制此IP地址`
       )
     }
-  }
-
-  // 安全输入处理函数
-  const secureInputContextLabel =
-    secureInputTarget === 'aster'
-      ? t('asterExchangeName', language)
-      : secureInputTarget === 'hyperliquid'
-        ? t('hyperliquidExchangeName', language)
-        : undefined
-
-  const handleSecureInputCancel = () => {
-    setSecureInputTarget(null)
-  }
-
-  const handleSecureInputComplete = ({
-    value,
-    obfuscationLog,
-  }: TwoStageKeyModalResult) => {
-    const trimmed = value.trim()
-    if (secureInputTarget === 'hyperliquid') {
-      setApiKey(trimmed)
-    }
-    if (secureInputTarget === 'aster') {
-      setAsterPrivateKey(trimmed)
-    }
-    console.log('Secure input obfuscation log:', obfuscationLog)
-    setSecureInputTarget(null)
-  }
-
-  // 掩盖敏感数据显示
-  const maskSecret = (secret: string) => {
-    if (!secret || secret.length === 0) return ''
-    if (secret.length <= 8) return '*'.repeat(secret.length)
-    return (
-      secret.slice(0, 4) +
-      '*'.repeat(Math.max(secret.length - 8, 4)) +
-      secret.slice(-4)
-    )
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -1879,7 +1844,10 @@ function ExchangeConfigModal({
                       color: '#EAECEF',
                     }}
                     aria-label={t('selectExchange', language)}
-                    disabled={webCryptoStatus !== 'secure'}
+                    disabled={
+                      webCryptoStatus !== 'secure' &&
+                      webCryptoStatus !== 'disabled'
+                    }
                     required
                   >
                     <option value="">
@@ -1918,6 +1886,35 @@ function ExchangeConfigModal({
                     </div>
                   </div>
                 </div>
+                {/* 注册链接 */}
+                {exchangeRegistrationLinks[selectedExchange.id] && (
+                  <a
+                    href={exchangeRegistrationLinks[selectedExchange.id].url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center justify-between p-3 rounded-lg transition-all hover:scale-[1.02]"
+                    style={{
+                      background: 'rgba(240, 185, 11, 0.08)',
+                      border: '1px solid rgba(240, 185, 11, 0.2)',
+                    }}
+                  >
+                    <div className="flex items-center gap-2">
+                      <UserPlus className="w-4 h-4" style={{ color: '#F0B90B' }} />
+                      <span className="text-sm" style={{ color: '#EAECEF' }}>
+                        {language === 'zh' ? '还没有交易所账号？点击注册' : "No exchange account? Register here"}
+                      </span>
+                      {exchangeRegistrationLinks[selectedExchange.id].hasReferral && (
+                        <span
+                          className="text-xs px-1.5 py-0.5 rounded"
+                          style={{ background: 'rgba(14, 203, 129, 0.2)', color: '#0ECB81' }}
+                        >
+                          {language === 'zh' ? '折扣优惠' : 'Discount'}
+                        </span>
+                      )}
+                    </div>
+                    <ExternalLink className="w-4 h-4" style={{ color: '#848E9C' }} />
+                  </a>
+                )}
               </div>
             )}
 
@@ -2287,58 +2284,22 @@ function ExchangeConfigModal({
                       >
                         {t('hyperliquidAgentPrivateKey', language)}
                       </label>
-                      <div className="flex flex-col gap-2">
-                        <div className="flex gap-2">
-                          <input
-                            type="text"
-                            value={maskSecret(apiKey)}
-                            readOnly
-                            placeholder={t(
-                              'enterHyperliquidAgentPrivateKey',
-                              language
-                            )}
-                            className="w-full px-3 py-2 rounded"
-                            style={{
-                              background: '#0B0E11',
-                              border: '1px solid #2B3139',
-                              color: '#EAECEF',
-                            }}
-                          />
-                          <button
-                            type="button"
-                            onClick={() => setSecureInputTarget('hyperliquid')}
-                            className="px-3 py-2 rounded text-xs font-semibold transition-all hover:scale-105"
-                            style={{
-                              background: '#F0B90B',
-                              color: '#000',
-                              whiteSpace: 'nowrap',
-                            }}
-                          >
-                            {apiKey
-                              ? t('secureInputReenter', language)
-                              : t('secureInputButton', language)}
-                          </button>
-                          {apiKey && (
-                            <button
-                              type="button"
-                              onClick={() => setApiKey('')}
-                              className="px-3 py-2 rounded text-xs font-semibold transition-all hover:scale-105"
-                              style={{
-                                background: '#1B1F2B',
-                                color: '#848E9C',
-                                whiteSpace: 'nowrap',
-                              }}
-                            >
-                              {t('secureInputClear', language)}
-                            </button>
-                          )}
-                        </div>
-                        {apiKey && (
-                          <div className="text-xs" style={{ color: '#848E9C' }}>
-                            {t('secureInputHint', language)}
-                          </div>
+                      <input
+                        type="password"
+                        value={apiKey}
+                        onChange={(e) => setApiKey(e.target.value)}
+                        placeholder={t(
+                          'enterHyperliquidAgentPrivateKey',
+                          language
                         )}
-                      </div>
+                        className="w-full px-3 py-2 rounded"
+                        style={{
+                          background: '#0B0E11',
+                          border: '1px solid #2B3139',
+                          color: '#EAECEF',
+                        }}
+                        required
+                      />
                       <div
                         className="text-xs mt-1"
                         style={{ color: '#848E9C' }}
@@ -2564,15 +2525,6 @@ function ExchangeConfigModal({
         </div>
       )}
 
-      {/* Two Stage Key Modal */}
-      <TwoStageKeyModal
-        isOpen={secureInputTarget !== null}
-        language={language}
-        contextLabel={secureInputContextLabel}
-        expectedLength={64}
-        onCancel={handleSecureInputCancel}
-        onComplete={handleSecureInputComplete}
-      />
     </div>
   )
 }
