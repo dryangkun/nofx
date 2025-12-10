@@ -1,5 +1,7 @@
 package trader
 
+//-----------dev_my---------------
+
 import (
 	"bytes"
 	"crypto/tls"
@@ -201,3 +203,5 @@ func (m *okxWsClient) shutdown() {
 func (m *okxWsClient) start() {
 	go m.goMonit()
 }
+
+//-----------dev_my---------------

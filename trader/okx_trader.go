@@ -62,8 +62,10 @@ type OKXTrader struct {
 	// Cache duration
 	cacheDuration time.Duration
 
+	//-----------dev_my---------------
 	// Updater by websocket
 	wsUpdater *okxTraderWsUpdater
+	//-----------dev_my---------------
 }
 
 // OKXInstrument OKX instrument info
@@ -110,7 +112,9 @@ func NewOKXTrader(apiKey, secretKey, passphrase string) *OKXTrader {
 		cacheDuration:    15 * time.Second,
 		instrumentsCache: make(map[string]*OKXInstrument),
 	}
+	//-----------dev_my---------------
 	trader.wsUpdater = okxTraderWsUpdaterNew(trader, 30*time.Minute)
+	//-----------dev_my---------------
 
 	// Set dual position mode
 	if err := trader.setPositionMode(); err != nil {
@@ -221,8 +225,10 @@ func (t *OKXTrader) convertSymbolBack(instId string) string {
 
 // GetBalance gets account balance
 func (t *OKXTrader) GetBalance() (map[string]interface{}, error) {
+	//-----------dev_my---------------
 	// try to start  websocket updater
 	t.wsUpdater.tryStart()
+	//-----------dev_my---------------
 	// Check cache
 	t.balanceCacheMutex.RLock()
 	if t.cachedBalance != nil && time.Since(t.balanceCacheTime) < t.cacheDuration {
@@ -293,8 +299,10 @@ func (t *OKXTrader) GetBalance() (map[string]interface{}, error) {
 
 // GetPositions gets all positions
 func (t *OKXTrader) GetPositions() ([]map[string]interface{}, error) {
+	//-----------dev_my---------------
 	// try to start  websocket updater
 	t.wsUpdater.tryStart()
+	//-----------dev_my---------------
 	// Check cache
 	t.positionsCacheMutex.RLock()
 	if t.cachedPositions != nil && time.Since(t.positionsCacheTime) < t.cacheDuration {
